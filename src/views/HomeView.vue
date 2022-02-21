@@ -14,5 +14,10 @@ export default {
   components: {
     HelloWorld,
   },
+  mounted() {
+    // asioxs -> $http
+    // console.log(this.$http.get);
+    console.log(process.env.VUE_APP_API, process.env.VUE_APP_PATH);
+  },
 };
 </script>
