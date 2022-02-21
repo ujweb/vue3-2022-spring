@@ -59,8 +59,14 @@ export default {
 @import "~bootstrap/scss/mixins";
 .cards {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto;
   grid-gap: 20px;
+  @include media-breakpoint-up(sm) {
+    grid-template-columns: auto auto;
+  }
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: auto auto auto;
+  }
   @include media-breakpoint-up(xl) {
     grid-template-columns: auto auto auto auto;
   }

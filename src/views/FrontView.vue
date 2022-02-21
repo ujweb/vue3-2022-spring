@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid h-100">
     <div class="row h-100">
-      <div class="col-md-2 py-2 d-flex flex-column flex-shrink-0 bg-light h-100">
+      <div class="col-lg-2 col-md-3 py-2 d-flex flex-column flex-shrink-0 bg-light h-100">
         <a
           href="/"
           class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"
@@ -42,7 +42,7 @@
           </router-link>
         </div>
       </div>
-      <div class="col-md-10 py-2">
+      <div class="col-lg-10 col-md-9 py-2">
         <router-view/>
       </div>
     </div>
@@ -50,8 +50,13 @@
 </template>
 
 <style lang="scss">
+  @import "~bootstrap/scss/functions"; // 必要的方法
+  @import "src/assets/sass/variables"; // 自行定義的變數路徑
+  @import "~bootstrap/scss/mixins";
   html, body, #app {
-    min-height: 100%;
-    height: 100%;
+    @include media-breakpoint-up(md) {
+      min-height: 100%;
+      height: 100%;
+    }
   }
 </style>
