@@ -1,4 +1,13 @@
 <template>
-  <h2>這是後台</h2>
-  <router-view/>
+  <router-view v-if="checkAccount" />
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      checkAccount: false,
+    };
+  },
+};
+</script>

@@ -15,11 +15,12 @@ const routes = [
     {
       path: 'cart',
       component: () => import('../views/CartView.vue'),
-    },
-    {
-      path: 'login',
-      component: () => import('../views/LoginView.vue'),
     }],
+  },
+  // 後台
+  {
+    path: '/login',
+    component: () => import('../views/LoginView.vue'),
   },
   // 後台
   {

@@ -1,8 +1,11 @@
 <template>
-  <h1>產品列表</h1>
+  <h1 class="mb-2">產品列表</h1>
+
   <div class="cards">
     <div class="card" v-for="product in products" :key="product.id">
-      <img :src="product.imageUrl" class="card-img-top" :alt="product.title">
+      <div class="card-img-3by2">
+        <img :src="product.imageUrl" class="card-img" :alt="product.title">
+      </div>
       <div class="card-body">
         <span class="badge bg-secondary bg-secondary bg-opacity-50 rounded-pill mb-1">
           {{ product.category }}
@@ -30,16 +33,8 @@
 export default {
   data() {
     return {
-      page: 1,
       products: [],
-      paginations: {},
       loaded: false,
-      modal: {
-        title: '',
-        content: '',
-        temp: {},
-      },
-
     };
   },
   mounted() {
@@ -69,6 +64,25 @@ export default {
   }
   @include media-breakpoint-up(xl) {
     grid-template-columns: auto auto auto auto;
+  }
+  .card-img-3by2 {
+    position: relative;
+    overflow: hidden;
+    &::before {
+      content: '';
+      display: block;
+      width: 100%;
+      padding-top: 66.666666666666667%;
+    }
+    > .card-img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 101%;
+      height: 101%;
+      object-fit: cover;
+      transform: translate(-50%, -50%);
+    }
   }
 }
 .line-clamp {
