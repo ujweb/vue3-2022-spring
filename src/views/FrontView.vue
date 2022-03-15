@@ -1,5 +1,8 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Eighth navbar example">
+  <nav
+    class="navbar navbar-expand-lg navbar-light bg-white border-bottom"
+    aria-label="Eighth navbar example"
+  >
     <div class="container">
       <a class="navbar-brand" href="#">Container</a>
       <button
@@ -40,45 +43,69 @@
   </nav>
   <div class="container py-5">
     <router-view />
-    <router-link to="/cart"
-      class="
-        cart-button
-        position-fixed end-0 bottom-0 p-1 m-2
-        btn-outline-secondary text-decoration-none
-        rounded-circle border border-1
-      "
-      v-if="cart.amout>0"
-    >
-      <span class="position-absolute translate-middle badge rounded-pill bg-danger">
-        {{ cart.amout }}
-      </span>
-      <span class="d-block material-icons">
-        shopping_cart
-      </span>
-    </router-link>
+    <front-cart></front-cart>
   </div>
 </template>
 
 <script>
+import FrontCart from '@/components/FrontCart.vue';
+
 export default {
+  components: { FrontCart },
   data() {
     return {
       cart: {
         data: [],
-        amout: 0,
+        amount: 0,
       },
     };
   },
+  provide() {
+    return {
+      provideCart: this.cart,
+    };
+  },
   mounted() {
-    const getCartApi = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/cart`;
-    this.$http.get(getCartApi)
-      .then((response) => {
-        // console.log(response);
-        this.cart.data = response.data.data.carts;
-        this.cart.data.forEach((element) => {
-          this.cart.amout += element.qty;
+    this.getCartAmount();
+  },
+  methods: {
+    updateCart(type, id, qty = 1) {
+      // console.log(type);
+      const data = {
+        product_id: id,
+        qty,
+      };
+      let cartUrl = null;
+      let method = null;
+      if (type === '新增購物車') {
+        cartUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/cart`;
+        method = 'post';
+      } else if (type === '編輯購物車') {
+        cartUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/cart/${this.$route.params.id}`;
+        method = 'put';
+      }
+      this.$http[method](cartUrl, { data })
+        .then((response) => {
+          console.log(response);
+          // this.getCart();
+          console.log(this);
+          this.$forceUpdate();
+        })
+        .catch((error) => {
+          console.dir(error);
         });
-      });
+    },
+    getCartAmount() {
+      const getCartApi = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/cart`;
+      this.$http.get(getCartApi)
+        .then((response) => {
+          // console.log(response);
+          this.cart.data = response.data.data.carts;
+          this.cart.data.forEach((element) => {
+            this.cart.amount += element.qty;
+          });
+        });
+    },
   },
 };
 </script>
@@ -90,13 +117,5 @@ export default {
 
   .navbar-dark .navbar-nav .nav-link.router-link-exact-active {
     color: $white;
-  }
-  .cart-button {
-    .badge {
-      top: 0.3125rem;
-      left: calc(100% - 0.3125rem);
-      padding: $badge-padding-y * 0.75 $badge-padding-x * 0.75;
-      letter-spacing: -.025em;
-    }
   }
 </style>

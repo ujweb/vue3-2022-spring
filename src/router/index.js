@@ -13,11 +13,15 @@ const routes = [
       component: () => import('../views/ProductsView.vue'),
     },
     {
+      path: 'product/:id',
+      component: () => import('../views/ProductView.vue'),
+    },
+    {
       path: 'cart',
       component: () => import('../views/CartView.vue'),
     }],
   },
-  // 後台
+  // 登入頁
   {
     path: '/login',
     component: () => import('../views/LoginView.vue'),
@@ -29,6 +33,18 @@ const routes = [
     children: [{
       path: 'products',
       component: () => import('../views/AdminProducts.vue'),
+    },
+    {
+      path: 'orders',
+      component: () => import('../views/AdminOrders.vue'),
+    },
+    {
+      path: 'coupons',
+      component: () => import('../views/AdminCoupons.vue'),
+    },
+    {
+      path: 'articles',
+      component: () => import('../views/AdminArticles.vue'),
     }],
   },
 ];

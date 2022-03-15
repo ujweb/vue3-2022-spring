@@ -1,19 +1,30 @@
 <template>
   <h1 class="mb-2">產品列表</h1>
-
+  <VueLoading
+    v-model:active="isLoading"
+    :can-cancel="false"
+    loader="dots"
+    color="white"
+    background-color="black"
+  ></VueLoading>
   <div class="cards">
-    <div class="card" v-for="product in products" :key="product.id">
-      <div class="card-img-3by2">
+    <div class="card border-0" v-for="product in products" :key="product.id">
+      <router-link
+        :to="`/product/${product.id}`"
+        class="card-img-3by2"
+      >
         <img :src="product.imageUrl" class="card-img" :alt="product.title">
-      </div>
+      </router-link>
       <div class="card-body">
-        <span class="badge bg-secondary bg-secondary bg-opacity-50 rounded-pill mb-1">
+        <span class="badge bg-secondary bg-opacity-50 rounded-pill mb-1">
           {{ product.category }}
         </span>
-        <h4 class="card-title text-truncate">{{ product.title }}</h4>
-        <p class="card-text line-clamp">
-          {{ product.description }}
-        </p>
+        <router-link
+          :to="`/product/${product.id}`"
+          class="d-block h4 card-title text-truncate link-black text-decoration-none"
+        >
+          {{ product.title }}
+        </router-link>
         <p class="mb-1">
           <del class="d-block fs-7 text-secondary">
             原價：{{ product.origin_price.toLocaleString() }}
@@ -22,8 +33,24 @@
             特價：{{ product.price.toLocaleString() }}
           </span>
         </p>
-        <button type="button" class="btn btn-sm btn-outline-secondary me-1 mt-1">查看更多</button>
-        <button type="button" class="btn btn-sm btn-primary mt-1">加入購物車</button>
+        <div class="row">
+          <div class="col pe-0 me-1 mt-1">
+            <router-link
+              :to="`/product/${product.id}`"
+              class="d-block w-100 btn btn-sm btn-outline-secondary"
+            >
+              查看更多
+            </router-link>
+          </div>
+          <div class="col ps-0 mt-1">
+            <button
+              type="button"
+              class="d-block w-100 btn btn-sm btn-primary"
+            >
+              加入購物車
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -33,16 +60,17 @@
 export default {
   data() {
     return {
+      isLoading: true,
       products: [],
-      loaded: false,
     };
   },
+  inject: ['provideCart'],
   mounted() {
     const getProductsApi = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/products/all`;
     this.$http.get(getProductsApi)
       .then((response) => {
         this.products = response.data.products;
-        this.loaded = true;
+        this.isLoading = false;
       });
   },
 };
@@ -54,19 +82,17 @@ export default {
 @import "~bootstrap/scss/mixins";
 .cards {
   display: grid;
-  grid-template-columns: auto;
+  grid-template-columns: 1fr;
   grid-gap: 20px;
   @include media-breakpoint-up(sm) {
-    grid-template-columns: auto auto;
+    grid-template-columns: 1fr 1fr;
   }
   @include media-breakpoint-up(lg) {
-    grid-template-columns: auto auto auto;
-  }
-  @include media-breakpoint-up(xl) {
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: 1fr 1fr 1fr;
   }
   .card-img-3by2 {
     position: relative;
+    display: block;
     overflow: hidden;
     &::before {
       content: '';

@@ -32,7 +32,13 @@
             </label>
           </div>
           <p class="fs-8 lh-sm my-0">{{ error }}</p>
-          <button class="btn btn-primary mt-2" type="submit">登入</button>
+          <button class="btn btn-primary w-100 mt-2" type="submit">登入</button>
+          <router-link
+            class="d-block btn btn-sm btn-link link-light mt-1 text-center text-decoration-none"
+            to="/"
+          >
+            返回前台
+          </router-link>
         </form>
       </div>
     </div>
