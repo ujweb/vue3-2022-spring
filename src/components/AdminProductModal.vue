@@ -211,7 +211,7 @@
           <div class="d-flex align-items-center justify-content-end mt-2">
             <button
               type="button"
-              class="btn btn-outline-primary me-1"
+              class="btn btn-outline-secondary me-1"
               data-bs-dismiss="modal"
             >
               取消

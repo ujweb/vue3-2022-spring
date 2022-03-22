@@ -26,7 +26,7 @@
             </tr>
           </thead>
           <tbody>
-          <tr v-for="(coupon, index) in coupons" :key="coupon.id">
+            <tr v-for="(coupon, index) in coupons" :key="coupon.id">
               <td>{{ index+1 }}</td>
               <td>{{ coupon.title }}</td>
               <td>{{ coupon.code }}</td>

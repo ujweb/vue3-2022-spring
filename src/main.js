@@ -6,6 +6,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 import emitter from '@/script/mitt';
 import VueLoading from 'vue-loading-overlay';
+import CKEditor from '@ckeditor/ckeditor5-vue';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import VCalendar from 'v-calendar';
 import 'v-calendar/dist/style.css';
@@ -21,6 +22,7 @@ app.config.globalProperties.$emitter = emitter;
 
 app.use(router);
 app.use(VueAxios, axios);
+app.use(CKEditor);
 app.use(VueLoading);
 app.use(VCalendar, {});
 app.component('VueLoading', VueLoading);

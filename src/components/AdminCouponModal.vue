@@ -109,25 +109,25 @@
             </div>
             <div class="col-md-12 mb-2">
               <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    value="is_enabled"
-                    id="checkEnable"
-                    v-model.number="data.is_enabled"
-                    :true-value="1"
-                    :false-value="0"
-                  />
-                  <label class="form-check-label" for="checkEnable">
-                    是否啟用
-                  </label>
-                </div>
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="is_enabled"
+                  id="checkEnable"
+                  v-model.number="data.is_enabled"
+                  :true-value="1"
+                  :false-value="0"
+                />
+                <label class="form-check-label" for="checkEnable">
+                  是否啟用
+                </label>
+              </div>
             </div>
           </div>
           <div class="d-flex align-items-center justify-content-end mt-2">
             <button
               type="button"
-              class="btn btn-outline-primary me-1"
+              class="btn btn-outline-secondary me-1"
               data-bs-dismiss="modal"
             >
               取消
