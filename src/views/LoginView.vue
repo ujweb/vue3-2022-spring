@@ -55,6 +55,9 @@ export default {
       },
     };
   },
+  mounted() {
+    this.$emitter.emit('page-loading', true);
+  },
   methods: {
     login() {
       const signinApi = `${process.env.VUE_APP_API}/admin/signin`;

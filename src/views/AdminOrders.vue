@@ -1,17 +1,10 @@
 <template>
-  <VueLoading
-    v-model:active="isLoading"
-    :can-cancel="false"
-    loader="dots"
-    color="white"
-    background-color="black"
-  ></VueLoading>
   <div class="d-flex align-items-center justify-content-between">
     <h1 class="mb-0">訂單列表</h1>
     <button
       class="btn btn-sm btn-danger"
       type="button"
-      @click="modal.title = '清除訂單'; deleteAllOrder();"
+      @click="modal.title = '清除訂單'; openOrderModal(modal.title, {});"
     >
       清除所有訂單
     </button>
@@ -39,15 +32,15 @@
                 <small class="d-block text-secondary">{{ toTime(order.create_at) }}</small>
               </td>
               <td>{{ order.id }}</td>
-              <td>{{ order.total }}</td>
+              <td>{{ toNumber(order.total) }}</td>
               <td>
                 <span class="text-success" v-if="order.is_paid">已付款</span>
                 <span class="text-danger" v-else>未付款</span>
               </td>
               <td>
                 <p class="m-0" v-if="order.is_paid">
-                  <small class="d-block text-secondary">{{ toDate(order.paid_date) }}</small>
-                  <small class="d-block text-secondary">{{ toTime(order.paid_date) }}</small>
+                  <small class="d-block text-secondary">{{ order.paid_date }}</small>
+                  <small class="d-block text-secondary">{{ order.paid_time }}</small>
                 </p>
                 <p v-else>-</p>
               </td>
@@ -77,10 +70,9 @@
   <OrderModal
     :modal="modal.temp"
     :type="modal.title"
-    @emit-update-data="getOrder"
-    @emit-open-success="openSuccessModal"
+    @emit-order-data="updatePaid"
   >
-    <template #title>{{ modal.title }}</template>
+    <template #title>{{ modal.temp.id }} {{ modal.title }}</template>
   </OrderModal>
   <SuccessModal>
     <template #title>{{ modal.title }}</template>
@@ -96,12 +88,11 @@
   </DangerModal>
   <DeleteModal
     :modal="modal.temp"
-    @emit-delete="getProduct"
-    @emit-open-success="openDangerModal"
+    @emit-delete="deleteOrder"
   >
     <template #title>{{ modal.title }}</template>
     <template #default>
-      <span class="d-block" v-if="modal.temp.id">
+      <span class="d-block" v-if="modal.title === '刪除訂單'">
         是否刪除編號為 <b class="text-danger">{{ modal.temp.id }}</b> 的訂單？<br />
       </span>
       <span class="d-block" v-else>
@@ -125,7 +116,6 @@ export default {
       page: 1,
       orders: [],
       paginations: {},
-      isLoading: true,
       bsModal: null,
       modal: {
         title: '',
@@ -134,6 +124,7 @@ export default {
       },
     };
   },
+  emits: ['page-loading'],
   components: {
     OrderModal,
     SuccessModal,
@@ -146,32 +137,79 @@ export default {
   methods: {
     getOrder(page = 1) {
       const adminOrdersUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/orders?page=${page}`;
+      this.$emitter.emit('page-loading', true);
       this.$http.get(adminOrdersUrl)
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           this.paginations = response.data.pagination;
           this.orders = response.data.orders;
-          this.isLoading = false;
+          this.$emitter.emit('page-loading', false);
         })
         .catch((error) => {
           console.dir(error);
           alert(error.response.data.message);
         });
     },
-    deleteAllOrder() {
-      // const adminDeleteOrdersUrl =
-      // `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/orders/all`;
-      // this.$http.delete(adminDeleteOrdersUrl)
-      //   .then((response) => {
-      //     console.log(response);
-      //     this.paginations = response.data.pagination;
-      //     this.orders = response.data.message;
-      //     this.isLoading = false;
-      //   })
-      //   .catch((error) => {
-      //     console.dir(error);
-      //     alert(error.response.data.message);
-      //   });
+    updatePaid(data) {
+      this.$emitter.emit('page-loading', true);
+      const adminOrderApi = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/order/${data.id}`;
+      const newDate = new Date();
+      const dateNow = Math.floor(Date.now() / 1000);
+      const paid = {
+        is_paid: data.is_paid,
+        paid_at: dateNow,
+        paid_date: this.toDate(dateNow),
+        paid_time: `${newDate.getHours()}:${newDate.getMinutes()}:${newDate.getSeconds()}`,
+      };
+      // console.log(paid);
+      let res = {};
+      this.$http.put(adminOrderApi, { data: paid })
+        .then((response) => {
+          res = {
+            title: '更新成功',
+            content: response.data.message,
+          };
+        }).catch((error) => {
+          res = {
+            title: '更新失敗',
+            content: error.response.data.message,
+          };
+        })
+        .finally(() => {
+          this.$emitter.emit('page-loading', false);
+          this.getOrder();
+          this.clearTemp();
+          this.openSuccessModal(res);
+        });
+    },
+    deleteOrder(data) {
+      this.$emitter.emit('page-loading', true);
+      let res = {};
+      let adminDeleteOrdersUrl = '';
+      if (this.modal.title === '刪除訂單') {
+        adminDeleteOrdersUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/order/${data.id}`;
+      } else if (this.modal.title === '清除訂單') {
+        adminDeleteOrdersUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/orders/all`;
+      }
+      this.$http.delete(adminDeleteOrdersUrl)
+        .then((response) => {
+          res = {
+            title: '刪除成功',
+            content: response.data.message,
+          };
+        })
+        .catch((error) => {
+          res = {
+            title: '刪除失敗',
+            content: error.response.data.message,
+          };
+        })
+        .finally(() => {
+          this.$emitter.emit('page-loading', false);
+          this.getOrder();
+          this.clearTemp();
+          this.openSuccessModal(res);
+        });
     },
     openOrderModal(type, data) {
       if (type === '訂單詳情') {
@@ -179,10 +217,10 @@ export default {
         this.modal.temp = JSON.parse(JSON.stringify(data));
       } else if (type === '刪除訂單') {
         this.bsModal = bsModal('deleteModal');
-        this.modal.temp = JSON.parse(JSON.stringify(data));
+        this.modal.temp = data;
       } else if (type === '清除訂單') {
         this.bsModal = bsModal('deleteModal');
-        this.modal.temp = {};
+        this.modal.temp = data;
       }
       this.bsModal.show();
     },
@@ -197,6 +235,12 @@ export default {
       this.modal.content = obj.content;
       this.bsModal = bsModal('DangerModal');
       this.bsModal.show();
+    },
+    clearTemp() {
+      this.modal.temp = {};
+    },
+    toNumber(val) {
+      return Number.parseInt(val, 10).toLocaleString();
     },
     toDate(timestamp) {
       const newDate = new Date(timestamp * 1000);

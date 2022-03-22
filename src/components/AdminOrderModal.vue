@@ -13,99 +13,115 @@
           <h2 class="mb-2"><slot name="title"></slot></h2>
           <div class="row">
             <div class="col-md-6">
-              <h5>訂購者資訊</h5>
-              <div class="form-floating mb-2">
-                <input
-                  type="text"
-                  class="form-control border-0 border-bottom border-secondary"
-                  id="floatingName"
-                  placeholder="姓名"
-                  v-model="user.name"
-                />
-                <label for="floatingName">姓名</label>
-              </div>
-              <div class="form-floating mb-2">
-                <input
-                  type="mail"
-                  class="form-control border-0 border-bottom border-secondary"
-                  id="floatingEmail"
-                  placeholder="Email"
-                  v-model="user.email"
-                />
-                <label for="floatingEmail">Email</label>
-              </div>
-              <div class="form-floating mb-2">
-                <input
-                  type="tel"
-                  class="form-control border-0 border-bottom border-secondary"
-                  id="floatingTel"
-                  placeholder="電話"
-                  v-model="user.tel"
-                />
-                <label for="floatingTel">電話</label>
-              </div>
-              <div class="form-floating mb-2">
-                <input
-                  type="text"
-                  class="form-control border-0 border-bottom border-secondary"
-                  id="floatingAddr"
-                  placeholder="地址"
-                  v-model="user.address"
-                />
-                <label for="floatingAddr">地址</label>
-              </div>
-              <div class="form-floating mb-2">
-                <input
-                  type="text"
-                  class="form-control border-0 border-bottom border-secondary"
-                  id="floatingText"
-                  placeholder="留言"
-                  v-model="data.message"
-                />
-                <label for="floatingText">留言</label>
-              </div>
+              <h5 class="mb-1">訂購者資訊</h5>
+              <table class="table">
+                <tbody v-if="user">
+                  <tr>
+                    <th style="width: 100px">姓名</th>
+                    <td>{{ user.name }}</td>
+                  </tr>
+                  <tr>
+                    <th>Email</th>
+                    <td>{{ user.email }}</td>
+                  </tr>
+                  <tr>
+                    <th>電話</th>
+                    <td>{{ user.tel }}</td>
+                  </tr>
+                  <tr>
+                    <th>地址</th>
+                    <td>{{ user.address }}</td>
+                  </tr>
+                  <tr>
+                    <th>留言</th>
+                    <td>{{ data.message }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="mt-5 mb-1">訂單細節</h5>
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <th style="width: 100px">下單時間</th>
+                    <td>{{ toDate(data.create_at) }}</td>
+                  </tr>
+                  <tr>
+                    <th>付款時間</th>
+                    <td>
+                      <span v-if="data.paid_at" class="text-success">
+                        {{ toDate(data.paid_at) }}
+                      </span>
+                      <span v-else class="text-muted">-</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>付款狀態</th>
+                    <td>
+                      <span v-if="data.is_paid" class="text-success">已付款</span>
+                      <span v-else class="text-muted">尚未付款</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="col-md-6">
-              <h5>訂單內容</h5>
-              <div class="card mb-3" v-for="detail in details" :key="detail.id">
-                <div class="row g-0 align-items-center">
-                  <div class="col-md-4">
-                    <img
-                      class="img-fluid"
-                      :src="detail.product.imageUrl"
-                      :alt="detail.product.title"
-                    >
-                  </div>
-                  <div class="col-md-4">
-                    <div class="card-body">
+              <h5 class="mb-1">訂單內容</h5>
+              <table class="table">
+                <tbody v-if="user">
+                  <tr v-for="detail in details" :key="detail.id">
+                    <td style="width: 150px;">
+                      <img
+                        class="img-fluid"
+                        :src="detail.product.imageUrl"
+                        :alt="detail.product.title"
+                      >
+                    </td>
+                    <td>
                       <h5 class="card-title">{{ detail.product.title }}</h5>
                       <p class="card-text">
                         <small class="text-secondary">
                           NT$ {{ toNumber(detail.product.price) }}
                         </small>
                       </p>
-                    </div>
-                  </div>
-                  <div class="col-md-4 d-flex align-items-center">
-                    <label for="editAmount">數量</label>
-                    <input
-                      type="number"
-                      min="1" max="10"
-                      id="editAmount"
-                      class="form-control form-control-sm w-auto mx-1"
-                      v-model="detail.qty"
-                      disabled
-                    >
-                    <!-- <button type="button" class="btn btn-sm btn-outline-danger px-1">
-                      <span class="d-block material-icons-outlined fs-4">delete</span>
-                    </button> -->
-                  </div>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center justify-content-end">
+                        <span class="pe-1">數量</span>
+                        <span>
+                          {{ detail.qty }}
+                          <small>/{{ detail.product.unit }}</small>
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  共 <span class="text-primary">{{ getTotalQty(details) }}</span> 項
+                </div>
+                <div>
+                  總金額：<span class="fs-3 text-primary">{{ toNumber(data.total) }}</span>
                 </div>
               </div>
-              <div class="d-flex align-items-center justify-content-end">
-                總金額：<span class="fs-3 text-primary">{{ toNumber(data.total) }}</span>
-              </div>
             </div>
+          </div>
+          <div class="d-flex align-items-center justify-content-end mt-2">
+              <div class="d-flex justify-content-end">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value=""
+                    id="flexCheckDefault"
+                    v-model="data.is_paid"
+                  />
+                  <label class="form-check-label" for="flexCheckDefault">
+                    <span v-if="data.is_paid">已付款</span>
+                    <span v-else>未付款</span>
+                  </label>
+                </div>
+              </div>
           </div>
           <div class="d-flex align-items-center justify-content-end mt-2">
             <button
@@ -119,9 +135,9 @@
               type="button"
               class="btn btn-primary"
               data-bs-dismiss="modal"
-              @click="updateProduct(title);"
+              @click="$emit('emit-order-data', data)"
             >
-              更新訂單
+              更新付款狀態
             </button>
           </div>
         </div>
@@ -136,19 +152,29 @@ export default {
     return {
       data: {},
       user: {},
-      details: {},
+      details: [],
       title: null,
-      return: {
-        title: null,
-        content: null,
-      },
     };
   },
   props: ['modal', 'type'],
-  emits: ['emit-update-data', 'emit-open-success'],
+  emits: ['emit-order-data'],
   methods: {
     toNumber(val) {
       return Number.parseInt(val, 10).toLocaleString();
+    },
+    toDate(timestamp) {
+      const newDate = new Date(timestamp * 1000);
+      return newDate.toLocaleDateString();
+    },
+    getTotalQty(details) {
+      let totalQty = 0;
+      if (typeof details !== 'undefined') {
+        Object.values(details).forEach((item) => {
+          // console.log(item);
+          totalQty += item.qty;
+        });
+      }
+      return totalQty;
     },
   },
   watch: {
@@ -168,5 +194,8 @@ export default {
     + .btn-sm {
       min-width: 0;
     }
+  }
+  table {
+    vertical-align: middle;
   }
 </style>

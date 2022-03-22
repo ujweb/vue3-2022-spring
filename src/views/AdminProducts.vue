@@ -1,11 +1,4 @@
 <template>
-  <VueLoading
-    v-model:active="isLoading"
-    :can-cancel="false"
-    loader="dots"
-    color="white"
-    background-color="black"
-  ></VueLoading>
   <div class="d-flex align-items-center justify-content-between">
     <h1 class="mb-0">產品列表</h1>
     <button
@@ -74,8 +67,7 @@
   <ProductModal
     :modal="modal.temp"
     :type="modal.title"
-    @emit-update-data="getProduct"
-    @emit-open-success="openSuccessModal"
+    @emit-update-data="updateProduct"
   >
     <template #title>{{ modal.title }}</template>
   </ProductModal>
@@ -85,7 +77,7 @@
       {{ modal.content }}
     </template>
   </SuccessModal>
-  <DangerModal>
+  <DangerModal :modal="modal.temp">
     <template #title>{{ modal.title }}</template>
     <template #default>
       {{ modal.content }}
@@ -93,8 +85,7 @@
   </DangerModal>
   <DeleteModal
     :modal="modal.temp"
-    @emit-delete="getProduct"
-    @emit-open-success="openDangerModal"
+    @emit-delete-data="deleteProduct"
   >
     <template #title>{{ modal.title }}</template>
     <template #default>
@@ -117,7 +108,6 @@ export default {
       page: 1,
       products: [],
       paginations: {},
-      isLoading: true,
       bsModal: null,
       modal: {
         title: '',
@@ -126,6 +116,7 @@ export default {
       },
     };
   },
+  emits: ['page-loading'],
   components: {
     ProductModal,
     SuccessModal,
@@ -138,19 +129,79 @@ export default {
   methods: {
     getProduct(page = 1) {
       const adminProductsUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/products?page=${page}`;
+      this.$emitter.emit('page-loading', true);
       this.$http.get(adminProductsUrl)
         .then((response) => {
           this.paginations = response.data.pagination;
           this.products = response.data.products;
-          this.isLoading = false;
+          this.$emitter.emit('page-loading', false);
         })
         .catch((error) => {
           console.dir(error);
           alert(error.response.data.message);
         });
     },
+    updateProduct(type, product) {
+      this.$emitter.emit('page-loading', true);
+      const dataProduct = {
+        data: product,
+      };
+      let adminProductUrl = null;
+      let method = null;
+      if (type === '新增產品') {
+        adminProductUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product`;
+        method = 'post';
+      } else if (type === '編輯產品') {
+        adminProductUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${this.modal.temp.id}`;
+        method = 'put';
+      }
+      this.$http[method](adminProductUrl, dataProduct)
+        .then((response) => {
+          // console.log(response);
+          if (type === '新增產品') {
+            this.modal.title = '新增成功';
+          } else if (type === '編輯產品') {
+            this.modal.title = '修改成功';
+          }
+          this.modal.content = response.data.message;
+          this.modal.temp = {};
+        })
+        .catch((error) => {
+          console.dir(error);
+          if (type === '新增產品') {
+            this.modal.title = '新增失敗';
+          } else if (type === '編輯產品') {
+            this.modal.title = '修改失敗';
+          }
+          this.modal.content = error.response.data.message;
+        })
+        .finally(() => {
+          this.getProduct();
+          this.openSuccessModal();
+        });
+    },
+    deleteProduct(product) {
+      const adminProductUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${product.id}`;
+      this.$emitter.emit('page-loading', true);
+      this.$http.delete(adminProductUrl)
+        .then((response) => {
+          // console.log(response);
+          this.modal.title = '刪除成功';
+          this.modal.content = response.data.message;
+          this.getProduct();
+        })
+        .catch((error) => {
+          console.dir(error);
+          this.modal.title = '刪除失敗';
+          this.modal.content = error.response.data.message;
+        })
+        .finally(() => {
+          this.openSuccessModal(this.modal.title, this.modal.content);
+        });
+    },
     toggleEnabled(product) {
       const adminProductUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${product.id}`;
+      this.$emitter.emit('page-loading', true);
       this.modal.temp = product;
 
       const dataProduct = {
@@ -165,23 +216,21 @@ export default {
       this.$http.put(adminProductUrl, dataProduct)
         .then((response) => {
           // console.log(response);
-          const obj = {
-            title: '修改成功',
-            content: response.data.message,
-          };
+          this.modal.title = '修改成功';
+          this.modal.content = response.data.message;
           this.getProduct();
-          this.openSuccessModal(obj);
         })
         .catch((error) => {
           console.dir(error);
-          const obj = {
-            title: '修改失敗',
-            content: error.response.data.message,
-          };
-          this.openSuccessModal(obj);
+          this.modal.title = '修改失敗';
+          this.modal.content = error.response.data.message;
+        })
+        .finally(() => {
+          this.openSuccessModal(this.modal.title, this.modal.content);
         });
     },
     openProductModal(type, data) {
+      this.$emitter.emit('page-loading', false);
       if (type === '編輯產品') {
         this.bsModal = bsModal('productModal');
         this.modal.temp = JSON.parse(JSON.stringify(data));
@@ -194,13 +243,13 @@ export default {
       }
       this.bsModal.show();
     },
-    openSuccessModal(obj) {
-      this.modal.title = obj.title;
-      this.modal.content = obj.content;
+    openSuccessModal() {
+      this.$emitter.emit('page-loading', false);
       this.bsModal = bsModal('SuccessModal');
       this.bsModal.show();
     },
     openDangerModal(obj) {
+      this.$emitter.emit('page-loading', false);
       this.modal.title = obj.title;
       this.modal.content = obj.content;
       this.bsModal = bsModal('DangerModal');

@@ -220,7 +220,7 @@
               type="button"
               class="btn btn-primary"
               data-bs-dismiss="modal"
-              @click="updateProduct(title);"
+              @click="$emit('emit-update-data', title, data)"
             >
               確認
             </button>
@@ -244,45 +244,8 @@ export default {
     };
   },
   props: ['modal', 'type'],
-  emits: ['emit-update-data', 'emit-open-success'],
+  emits: ['emit-update-data'],
   methods: {
-    updateProduct(title) {
-      const dataProduct = {
-        data: this.data,
-      };
-
-      let adminProductUrl = null;
-      let method = null;
-      if (title === '新增產品') {
-        adminProductUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product`;
-        method = 'post';
-      } else if (title === '編輯產品') {
-        adminProductUrl = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${this.data.id}`;
-        method = 'put';
-      }
-      this.$http[method](adminProductUrl, dataProduct)
-        .then((response) => {
-          // console.log(response);
-          if (title === '新增產品') {
-            this.return.title = '新增成功';
-          } else if (title === '編輯產品') {
-            this.return.title = '修改成功';
-          }
-          this.return.content = response.data.message;
-          this.$emit('emit-update-data');
-          this.$emit('emit-open-success', this.return);
-          this.data = {};
-        })
-        .catch((error) => {
-          console.dir(error);
-          if (title === '新增產品') {
-            this.return.title = '新增失敗';
-          } else if (title === '編輯產品') {
-            this.return.title = '修改失敗';
-          }
-          this.return.content = error.response.data.message;
-        });
-    },
     uploadImage(e) {
       const formData = new FormData();
       formData.append('file-to-upload', e.target.files[0]);

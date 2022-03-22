@@ -1,5 +1,6 @@
 <template>
-  <router-view/>
+  <PageLoading />
+  <router-view />
 </template>
 
 <style lang="scss">

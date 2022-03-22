@@ -88,8 +88,6 @@ export default {
         .then((response) => {
           console.log(response);
           // this.getCart();
-          console.log(this);
-          this.$forceUpdate();
         })
         .catch((error) => {
           console.dir(error);

@@ -45,6 +45,10 @@ const routes = [
     {
       path: 'articles',
       component: () => import('../views/AdminArticles.vue'),
+    },
+    {
+      path: 'article',
+      component: () => import('../views/AdminArticle.vue'),
     }],
   },
 ];

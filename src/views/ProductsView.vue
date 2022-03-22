@@ -1,12 +1,5 @@
 <template>
   <h1 class="mb-2">產品列表</h1>
-  <VueLoading
-    v-model:active="isLoading"
-    :can-cancel="false"
-    loader="dots"
-    color="white"
-    background-color="black"
-  ></VueLoading>
   <div class="cards">
     <div class="card border-0" v-for="product in products" :key="product.id">
       <router-link
@@ -60,17 +53,17 @@
 export default {
   data() {
     return {
-      isLoading: true,
       products: [],
     };
   },
   inject: ['provideCart'],
+  emits: ['page-loading'],
   mounted() {
     const getProductsApi = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/products/all`;
     this.$http.get(getProductsApi)
       .then((response) => {
         this.products = response.data.products;
-        this.isLoading = false;
+        this.$emitter.emit('page-loading', false);
       });
   },
 };
