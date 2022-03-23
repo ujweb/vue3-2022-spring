@@ -56,7 +56,7 @@ export default {
     };
   },
   mounted() {
-    this.$emitter.emit('page-loading', true);
+    this.$emitter.emit('page-loading', false);
   },
   methods: {
     login() {

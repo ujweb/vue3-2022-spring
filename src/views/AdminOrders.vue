@@ -141,9 +141,9 @@ export default {
       this.$http.get(adminOrdersUrl)
         .then((response) => {
           // console.log(response);
+          this.$emitter.emit('page-loading', false);
           this.paginations = response.data.pagination;
           this.orders = response.data.orders;
-          this.$emitter.emit('page-loading', false);
         })
         .catch((error) => {
           console.dir(error);

@@ -220,7 +220,6 @@ export default {
           this.modal.content = error.response.data.message;
         })
         .finally(() => {
-          this.$emitter.emit('page-loading', false);
           this.getArticles();
           this.clearTemp();
           this.openSuccessModal();

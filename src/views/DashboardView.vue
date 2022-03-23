@@ -70,6 +70,7 @@ export default {
       const checkUserApi = `${process.env.VUE_APP_API}/api/user/check`;
       this.$http.post(checkUserApi)
         .then(() => {
+          this.$emitter.emit('page-loading', false);
           this.checkAccount = true;
         })
         .catch((error) => {

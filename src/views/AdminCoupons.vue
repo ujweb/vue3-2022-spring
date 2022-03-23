@@ -131,6 +131,7 @@ export default {
         });
     },
     updateCoupon(coupon) {
+      this.$emitter.emit('page-loading', true);
       const type = this.modal.title;
       let adminCouponApi = '';
       let method = '';
@@ -185,7 +186,6 @@ export default {
           this.modal.content = error.response.data.message;
         })
         .finally(() => {
-          this.$emitter.emit('page-loading', false);
           this.getCoupons();
           this.clearTemp();
           this.openSuccessModal();

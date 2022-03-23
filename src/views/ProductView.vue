@@ -125,9 +125,9 @@ export default {
       const getProductApi = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/product/${this.$route.params.id}`;
       this.$http.get(getProductApi)
         .then((response) => {
+          this.$emitter.emit('page-loading', false);
           this.product = response.data.product;
           this.mainImg = response.data.product.imageUrl;
-          this.loaded = true;
         });
     },
     changeImg(img) {

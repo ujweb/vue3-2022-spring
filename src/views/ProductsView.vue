@@ -62,8 +62,8 @@ export default {
     const getProductsApi = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/products/all`;
     this.$http.get(getProductsApi)
       .then((response) => {
-        this.products = response.data.products;
         this.$emitter.emit('page-loading', false);
+        this.products = response.data.products;
       });
   },
 };
