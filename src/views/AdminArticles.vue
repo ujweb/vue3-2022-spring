@@ -244,7 +244,10 @@ export default {
       this.bsModal.show();
     },
     toTags(array) {
-      return array.join('、');
+      if (typeof array !== 'undefined') {
+        return array.join('、');
+      }
+      return '';
     },
     clearTemp() {
       this.modal.temp = {};
