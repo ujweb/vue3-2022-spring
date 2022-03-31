@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkvue3_2022_spring"]=self["webpackChunkvue3_2022_spring"]||[]).push([[32],{7032:function(n,r,u){u.r(r),u.d(r,{default:function(){return a}});var e=u(6252);function t(n,r){return(0,e.wg)(),(0,e.iD)("h1",null,"購物車")}var s=u(3744);const c={},i=(0,s.Z)(c,[["render",t]]);var a=i}}]);
+//# sourceMappingURL=32.e48bafc0.js.map
